@@ -3,11 +3,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 from matplotlib.colors import ListedColormap
 
 # Reading data from csv
-file_day_path = "/dashboard/cleaned_file_day.csv"
-file_hour_path = "/dashboard/cleaned_file_hour.csv"
+file_day_path = os.getcwd().replace("\\", "/") + '/dashboard/cleaned_file_day.csv'
+file_hour_path = os.getcwd().replace("\\", "/") + '/dashboard/cleaned_file_hour.csv'
 
 bike_day = pd.read_csv(file_day_path)
 bike_hour = pd.read_csv(file_hour_path)
