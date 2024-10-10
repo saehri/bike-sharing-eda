@@ -10,11 +10,9 @@ pip install -r requirements.txt
 
 ## Setup Environment - Shell/Terminal
 
-In this folder, run:
+In this (submission_bahri) folder, run:
 
 ```
-pipenv install
-pipenv shell
 pip install -r requirements.txt
 ```
 
