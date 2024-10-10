@@ -6,8 +6,8 @@ import seaborn as sns
 from matplotlib.colors import ListedColormap
 
 # Reading data from csv
-file_day_path = "/cleaned_file_day.csv"
-file_hour_path = "/cleaned_file_hour.csv"
+file_day_path = "/dashboard/cleaned_file_day.csv"
+file_hour_path = "/dashboard/cleaned_file_hour.csv"
 
 bike_day = pd.read_csv(file_day_path)
 bike_hour = pd.read_csv(file_hour_path)
