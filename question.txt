@@ -1,8 +1,0 @@
-## Menentukan Pertanyaan Bisnis
-
-1. **How do weather conditions affect bike rentals?**
-
-   - Purpose: Understanding the relationship between weather variables (e.g., temperature, humidity, wind speed, weather situation) and the number of bike rentals can help the business predict demand and optimize bike availability during different weather conditions.
-
-2. **What are the peak hours or days for bike rentals, and how can bike availability be optimized?**
-   - Purpose: By analyzing bike usage trends over different days of the week (weekday), times of day (hour), and seasons (season), the company can better allocate resources and bikes during peak demand periods.
