@@ -1,75 +1,82 @@
-import streamlit as st 
+import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-from matplotlib.colors import ListedColormap
+import matplotlib.dates as mdates
 
-# Reading data from csv
-file_day_path = os.getcwd().replace("\\", "/") + '/dashboard/cleaned_file_day.csv'
-file_hour_path = os.getcwd().replace("\\", "/") + '/dashboard/cleaned_file_hour.csv'
+# Load dataset
+bike_day_data = pd.read_csv('cleaned_file_day.csv')
+bike_hour_data = pd.read_csv('cleaned_file_hour.csv')
+bike_day_data['date'] = pd.to_datetime(bike_day_data['date'])
 
-bike_day = pd.read_csv(file_day_path)
-bike_hour = pd.read_csv(file_hour_path)
+# Title of the dashboard
+st.title('Bike Sharing Analytical Dashboard')
 
-st.title("Bike Sharing Dataset Analysis")
-
-# Create a Streamlit app
-st.write("""
-## 1. Casual and Registered Rides Distributions
-### What is the distributions of casual and registered rides in different seasons?
-         """)
-# Group the data by 'date' and 'season' and show the sum of 'casual' and 'registered'
-st.subheader("Grouped Data by Date and Season")
-grouped_data = bike_hour.groupby(['date', 'season'])[['casual', 'registered']].sum()
-st.write(grouped_data)
-
-# Display the boxplot for casual and registered users per season
-st.subheader("Boxplot of Rides per Day by Season")
-
-# Prepare data for the boxplot
-df = bike_hour[['season', 'casual', 'registered']]
-melted_df = pd.melt(df, id_vars='season', var_name='status', value_name='rides per day')
-
-# Create the boxplot
-plt.figure(figsize=(10, 6))
-sns.boxplot(data=melted_df, x='season', y='rides per day', hue='status', showfliers=False)
-plt.title('Distribution of Rides by Season and User Type')
-plt.tight_layout()
-
-# Display the plot in Streamlit
-st.pyplot(plt)
+# Sidebar options for analysis
+st.sidebar.header("Menu")
+analysis_type = st.sidebar.selectbox("Choose the analysis", ["Weather and Bike Rental Analysis", "Bike Rental Peaks Hours"])
 
 
-# --------------------
-
-variable_df = bike_hour[['season', 'temperature', 'humidity', 'windspeed', 'casual', 'registered', 'total']]
-
-st.write("""
-## 2. Seasonal Heatmap Correlation
-### What is the pattern between variables in bike_hour data?
-         """)
-
-# Plotting the heatmaps for each season
-fig, axes = plt.subplots(1, 4, figsize=(15, 6))
-
-# Loop through unique season values in the 'season' column
-for i, season in enumerate(variable_df["season"].unique()):
-    season_name = season  # Get season name from the 'season' column
+if analysis_type.lower() == "weather and bike rental analysis":
+    st.subheader("The Correlations Between Weather and Daily Bike Rental")
     
-    # Filter the data for the current season
-    season_data = variable_df[variable_df["season"] == season]
+    weather_correlation = bike_day_data[['temperature', 'humidity', 'windspeed', 'total']].corr()
     
-    # Calculate the Spearman correlation matrix
-    corr_matrix = season_data.corr(numeric_only=True, method='spearman')
+    # Display the correlations matrix heatmap
+    st.write(f"Correlations Matrix of Weather and Bike Rentals: ")
+    sns.heatmap(weather_correlation, annot=True, cmap="coolwarm", fmt=".2f")
+    st.pyplot(plt)
+
+    weather_feature = st.selectbox("Choose weather feature:", ["Temperature", "Humidity", "Wind Speed"])
+
+    if weather_feature == "Temperature":
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(x='temperature', y='total', data=bike_day_data, hue='temperature', palette='coolwarm')
+        plt.title("Bike Rentals Daily vs Temperature")
+        plt.xlabel("Temperature (normalized)")
+        plt.ylabel("Total Bike Rentals")
+        st.pyplot(plt)
+    elif weather_feature == "Humidity":
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(x='humidity', y='total', data=bike_day_data, hue='humidity', palette='coolwarm')
+        plt.title("Bike Rentals Daily vs Humidity")
+        plt.xlabel("Humidity (normalized)")
+        plt.ylabel("Total Bike Rentals")
+        st.pyplot(plt)
+    elif weather_feature == "Wind Speed":
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(x='windspeed', y='total', data=bike_day_data, hue='windspeed', palette='coolwarm')
+        plt.title("Bike Rentals Daily vs Wind Speed")
+        plt.xlabel("Wind Speed (normalized)")
+        plt.ylabel("Total Bike Rentals")
+        st.pyplot(plt)
+
+
+else:
+    st.subheader("Analysis on the peak hours or days for bike rentals")
+
+    event_filter = st.selectbox("Choose time-span", ["Weekday", "Hours", "Seasons"])
     
-    # Plot the heatmap for the current season
-    sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", vmin=-1, vmax=1, ax=axes[i])
-    axes[i].set_title(f"Season: {season_name}")
-
-# Adjust layout
-plt.subplots_adjust(left=1, right=2, top=0.9, bottom=0.1)
-
-# Display the plot in Streamlit
-st.pyplot(fig)
+    if event_filter == "Weekday":
+        plt.figure(figsize=(10, 6))
+        weekday_rentals = bike_hour_data.groupby('weekday')['total'].mean().reset_index()
+        sns.barplot(x='weekday', y='total', hue="weekday", data=weekday_rentals, palette='Oranges_d')
+        plt.title("Average Bike Rentals Per Day of the Week")
+        plt.xlabel("Day of the Week (0: Monday, 6: Sunday)")
+        plt.ylabel("Average Total Bike Rentals")
+        st.pyplot(plt)
+    elif event_filter == "Hours":
+        plt.figure(figsize=(10, 6))
+        sns.histplot(bike_hour_data['total'], kde=True)
+        plt.title("Distributions of Bike Rental Hourly")
+        plt.xlabel("Total")
+        plt.ylabel("Frequency")
+        st.pyplot(plt)
+    elif event_filter == "Seasons":
+        plt.figure(figsize=(8, 6))
+        season_rentals = bike_hour_data.groupby('season')['total'].mean().reset_index()
+        sns.barplot(x='season', y='total', hue='season', data=season_rentals, palette='Greens_d')
+        plt.title("Average Bike Rentals Hourly Per Season")
+        plt.xlabel("Season (1: Spring, 2: Summer, 3: Fall, 4: Winter)")
+        plt.ylabel("Average Total Bike Rentals")
+        st.pyplot(plt)

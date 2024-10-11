@@ -1,32 +1,21 @@
 # BIKE SHARING DATA ANALYSIS ✨
 
-## Setup Environment - Anaconda
+## How to Run Streamlit App
 
-```
-conda create --name .venv python=3.9
-conda activate .venv
-pip install -r requirements.txt
-```
-
-## Setup Environment - Shell/Terminal
-
-In this (submission_bahri) folder, run:
+1. Install dependencies:
 
 ```
 pip install -r requirements.txt
 ```
 
-## Run steamlit app
-
-If you are not inside the 'dashboard' folder
-Move to the 'dashboard' directory
+2. If you are not inside the 'dashboard' folder, move to the 'dashboard' directory
 
 ```
 cd dashboard
 ```
 
-Then run
+3. Then run
 
 ```
-streamlit run /dashboard/dashboard.py
+streamlit run dashboard.py
 ```
